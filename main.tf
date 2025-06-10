@@ -48,28 +48,12 @@ resource "aws_route_table_association" "a3" {
   route_table_id = aws_route_table.public.id
 }
 
-resource "aws_security_group" "allow_http" {
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
 
 resource "aws_instance" "server1" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public1.id
+  availability_zone      = var.avail_zone
   vpc_security_group_ids = [aws_security_group.allow_http.id]
 
   user_data = <<-EOF
@@ -85,6 +69,7 @@ resource "aws_instance" "server2" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public2.id
+  availability_zone      = var.avail_zone
   vpc_security_group_ids = [aws_security_group.allow_http.id]
 
   user_data = <<-EOF
@@ -100,13 +85,9 @@ resource "aws_instance" "server3" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public3.id
+  availability_zone      = var.avail_zone
   vpc_security_group_ids = [aws_security_group.allow_http.id]
 
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update
-              apt-get install -y openjdk-11-jdk
-              wget -O jenkins.war http://mirrors.jenkins.io/war-stable/latest/jenkins.war
-              nohup java -jar jenkins.war &
-              EOF
+  user_data = file("jenkins.sh")
+
 }

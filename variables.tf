@@ -3,6 +3,11 @@ variable "region" {
   type        = string
   default     = "us-east-2"
 }
+variable "avail_zone" {
+  description = "The AWS availability zone to deploy resources"
+  type        = string
+  default     = "us-east-2b"
+}
 
 variable "instance_type" {
   description = "The type of EC2 instance"
